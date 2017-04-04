@@ -295,16 +295,15 @@ return a regular expression dandifying the symbol at point."
   (let* ((bounds (highlight-symbol-bounds))
          (beg (car bounds))
          (end (cdr bounds))
-         res)
-    (when (and beg end)
-      (setq res (let ((str (filter-buffer-substring beg end)))
-                  (dolist (regex highlight-symbol-list)
-                    (when (string-match regex str)
-                      (return regex))))))
-    (or res
-        (concat (car highlight-symbol-border-pattern)
-                (filter-buffer-substring beg end)
-                (cdr highlight-symbol-border-pattern)))))
+         (sym (and beg end
+                 (filter-buffer-substring beg end))))
+    (when sym
+      (or (dolist (regex highlight-symbol-list)
+           (when (string-match regex sym)
+             (return regex)))
+         (concat (car highlight-symbol-border-pattern)
+                 (regexp-quote sym)
+                 (cdr highlight-symbol-border-pattern))))))
 
 (defun highlight-symbol-temp-highlight ()
   "Highlight the current symbol until a command is executed."
